@@ -1,6 +1,19 @@
 import requests
 import json
 
+
+function fulfillment(request, response) {
+  let action = request.body.queryResult.action;
+
+  if (action === 'openai_chat') {
+    let question = request.body.queryResult.parameters.pergunta;
+    let answer = openai_chat(question);
+    response.json({ fulfillmentText: answer });
+  } else {
+    response.json({ fulfillmentText: 'Ação não reconhecida' });
+  }
+}
+
 def openai_chat(question):
     url = "https://api.openai.com/v1/engines/davinci-codex/completions"
     headers = {
