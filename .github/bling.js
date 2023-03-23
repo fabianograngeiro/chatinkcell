@@ -3,36 +3,30 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 
 const app = express();
+const port = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/', async (req, res) => {
-  const intent = req.body.queryResult.intent.displayName;
-  const osNumber = req.body.queryResult.parameters.osNumber;
+app.post('/webhook', async (req, res) => {
+  // Recupera o número da ordem de serviço fornecido pelo usuário
+  const orderId = req.body.queryResult.parameters['numero-os'];
 
-  if (intent === 'ordem-de-servico') {
-    try {
-      const response = await axios.get(`https://bling.com.br/api/v2/servico/${osNumber}/json`);
+  // Faz uma chamada à rota da sua aplicação no GitHub para recuperar as informações necessárias
+  const response = await axios.get(``);
 
-      const serviceStatus = response.data.retorno.servico.status;
-      const serviceLink = response.data.retorno.servico.link;
+  // Recupera as informações necessárias da resposta da rota em sua aplicação no GitHub
+  const informacoes = response.data.informacoes;
 
-      let message = `A sua ordem de serviço ${osNumber} está ${serviceStatus}. `;
-      message += `Acesse o link a seguir para mais informações: ${serviceLink}`;
+  // Cria uma mensagem de resposta formatada com as informações recuperadas
+  const message = `A ordem de serviço ${orderId} está com o status ${informacoes.status}. Clique aqui para acessar: ${informacoes.link}`;
 
-      res.json({
-        fulfillmentText: message,
-      });
-    } catch (error) {
-      console.error(error);
-      res.json({
-        fulfillmentText: 'Não foi possível encontrar a ordem de serviço solicitada. Por favor, verifique o número informado e tente novamente.',
-      });
-    }
-  }
+  // Retorna a mensagem de resposta para o chatbot
+  res.json({
+    fulfillmentText: message,
+  });
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log('Webhook running on port 3000');
+app.listen(port, () => {
+  console.log(`Servidor iniciado na porta ${port}`);
 });
