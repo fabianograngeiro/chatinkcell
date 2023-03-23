@@ -13,7 +13,7 @@ app.post('/webhook', async (req, res) => {
   const orderId = req.body.queryResult.parameters['numero-os'];
 
   // Faz uma chamada à rota da sua aplicação no GitHub para recuperar as informações necessárias
-  const response = await axios.get(``);
+  const response = await axios.get(`https://github.com/fabianograngeiro/chatinkcell.git`);
 
   // Recupera as informações necessárias da resposta da rota em sua aplicação no GitHub
   const informacoes = response.data.informacoes;
