@@ -5,7 +5,7 @@ def openai_chat(question):
     url = "https://api.openai.com/v1/engines/davinci-codex/completions"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer YOUR_API_KEY"
+        "Authorization": "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"
     }
     data = {
         "prompt": question,
