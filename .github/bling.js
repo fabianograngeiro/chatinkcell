@@ -2,10 +2,34 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
+
+
 const app = express();
 const port = process.env.PORT || 3000;
-
+import dialogflow
+from flask import flask, request, make_response
 import requests
+app = Flask(__name__)
+import requests
+
+app.route('/webhook', methods=['POST'])
+def webhook():
+    req = request.get_json(force=True)
+
+    action = req.get('queryResult').get('action')
+    parameters = req.get('queryResult').get('parameters')
+
+    if action == 'ordem-de-servico':
+        numero_os = parameters.get('numero')
+        link_os = obter_link_os(numero_os)
+
+        message = f"O link da ordem de serviço é {link_os}"
+
+    else:
+        message = "Desculpe, não entendi o que você quer."
+
+    fulfillment = dialogflow.FulfillmentText(message)
+    return make_response(fulfillment.to_dict())
 
 bling_api_key = 'SUA_CHAVE_API_AQUI'
 
