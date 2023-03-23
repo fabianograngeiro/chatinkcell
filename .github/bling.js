@@ -1,30 +1,38 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
+
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.post('/webhook', (req, res) => {
-  const intentName = req.body.queryResult.intent.displayName;
-  
-  if (intentName === 'ordem de serviço') {
-    const numeroOrdem = req.body.queryResult.parameters.numeroOrdem;
-    const urlStatus = `https://seusite.com/status/${numeroOrdem}`;
-    // Aqui você pode adicionar a lógica para buscar as informações da API Bling 
-    // e adicionar o status do serviço na resposta ao usuário
-    const mensagem = `O status do seu equipamento está disponível em: ${urlStatus}`;
-    const resposta = {
-      fulfillmentText: mensagem
-    };
-    res.json(resposta);
-  } else {
-    const resposta = {
-      fulfillmentText: 'Desculpe, não entendi o que você quer dizer.'
-    };
-    res.json(resposta);
+app.post('/', async (req, res) => {
+  const intent = req.body.queryResult.intent.displayName;
+  const osNumber = req.body.queryResult.parameters.osNumber;
+
+  if (intent === 'ordem-de-servico') {
+    try {
+      const response = await axios.get(`https://bling.com.br/api/v2/servico/${osNumber}/json`);
+
+      const serviceStatus = response.data.retorno.servico.status;
+      const serviceLink = response.data.retorno.servico.link;
+
+      let message = `A sua ordem de serviço ${osNumber} está ${serviceStatus}. `;
+      message += `Acesse o link a seguir para mais informações: ${serviceLink}`;
+
+      res.json({
+        fulfillmentText: message,
+      });
+    } catch (error) {
+      console.error(error);
+      res.json({
+        fulfillmentText: 'Não foi possível encontrar a ordem de serviço solicitada. Por favor, verifique o número informado e tente novamente.',
+      });
+    }
   }
 });
 
-app.listen(3000, () => {
-  console.log('Servidor iniciado na porta 3000');
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Webhook running on port 3000');
 });
