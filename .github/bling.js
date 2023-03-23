@@ -5,6 +5,17 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
+import requests
+
+bling_api_key = 'SUA_CHAVE_API_AQUI'
+
+def obter_link_os(numero_os):
+    url = f'https://bling.com.br/Api/v2/os/{numero_os}/{bling_api_key}/json'
+    response = requests.get(url)
+    response_json = response.json()
+    link_os = response_json['retorno']['pedidos'][0]['pedido']['linkPagamento']
+    return link_os
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
