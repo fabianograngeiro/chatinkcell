@@ -1,0 +1,16 @@
+import requests
+import json
+
+def openai_chat(question):
+    url = "https://api.openai.com/v1/engines/davinci-codex/completions"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer YOUR_API_KEY"
+    }
+    data = {
+        "prompt": question,
+        "max_tokens": 50,
+        "temperature": 0.5
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    return response.json()["choices"][0]["text"]
